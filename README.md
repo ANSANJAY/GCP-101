@@ -1,4 +1,3 @@
-
 # Google Cloud Practical Demos
 
 This repository contains a curated set of practical, hands-on demos covering key Google Cloud services. It is designed to help engineers, architects, and learners build real-world skills across Compute, Kubernetes, Networking, IAM, Data Solutions, and more.
