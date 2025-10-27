@@ -1,0 +1,40 @@
+if message and record.container_name
+   and string.match(record.container_name, "ftp")
+   and string.match(message, "You are user") then
+
+    local active, max = string.match(
+        message,
+        ".*You are user%s*(number%s*)?(%d+)%s+of%s+(%d+)"
+    )
+
+    if active and max then
+        local payload = {
+            logType = "ELF",
+            schemaVersion = "1.0.0",
+            type = "log",
+            level = "INFO",
+            environment = environment,
+            application = application,
+            tags = tags,
+            ftp_metrics = {
+                active_users = tonumber(active),
+                max_users = tonumber(max)
+            },
+            message = message,
+            timestamp = os.date("!%Y-%m-%dT%H:%M:%S.000Z", timestamp)
+        }
+        return 1, timestamp, payload
+    end
+end
+
+
+
+fluent-bit \
+  -i dummy \
+  -p 'dummy={"log":"220-You are user number 2 of 200 allowed.","container_name":"ftp-xyz","pod_name":"ftp-xyz","namespace_name":"r42"}' \
+  -F lua \
+  -p script=/fluent-bit/etc/conf/lua-scripts/filters.lua \
+  -p call=record_modifier \
+  -o stdout \
+  -m '*' \
+  -vv
